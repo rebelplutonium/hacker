@@ -1,0 +1,33 @@
+Host origin
+HostName github.com
+User git
+IdentityFile ~/.ssh/origin.id_rsa
+
+Host upstream
+HostName github.com
+User git
+IdentityFile ~/.ssh/upstream.id_rsa
+
+Host report
+HostName github.com
+User git
+IdentityFile ~/.ssh/report.id_rsa
+
+Host lieutenant
+HostName 34.229.36.153
+User user
+LocalForward 10283 0.0.0.0:22
+LocalForward 11578 0.0.0.0:11578
+IdentityFile ~/.ssh/lieutenant.id_rsa
+
+Host pavillion
+HostName 127.0.0.1
+Port 11578
+ForwardX11Trusted yes
+IdentityFile ~/.ssh/pavillion.id_rsa
+
+Host extra
+IdentityFile ~/.ssh/lieutenant_id_rsa
+ControlMaster auto
+ControlPath ~/.ssh/lieutenant_%h_%p_%r_ctrl_path
+ControlPersist yes
