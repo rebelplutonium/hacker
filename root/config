@@ -15,7 +15,7 @@ IdentityFile ~/.ssh/report.id_rsa
 
 Host lieutenant-ec2
 HostName 34.229.36.153
-User user
+User ec2-user
 IdentityFile ~/.ssh/lieutenant-ec2.id_rsa
 
 Host lieutenant
