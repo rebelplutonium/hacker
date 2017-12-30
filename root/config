@@ -13,6 +13,11 @@ HostName github.com
 User git
 IdentityFile ~/.ssh/report.id_rsa
 
+Host lieutenant-ec2
+HostName 34.229.36.153
+User user
+IdentityFile ~/.ssh/lieutenant-ec2.id_rsa
+
 Host lieutenant
 HostName 34.229.36.153
 User user
