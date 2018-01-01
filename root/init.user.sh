@@ -8,21 +8,9 @@ ${AWS_DEFAULT_REGION}
 
 EOF
     ) | aws configure &&
-    sleep 15s &&
-    PUBLIC_IP_ADDRESS=$(aws ec2 describe-instances --filters Name=tag:moniker,Values=lieutenant Name=instance-state-name,Values=running --query "Reservations[*].Instances[*].PublicIpAddress" --output text) &&
-    echo ${PUBLIC_IP_ADDRESS} &&
-    sed \
-        -e "s#127.0.0.1#${PUBLIC_IP_ADDRESS}#" \
-        -e "s#\${HOST_NAME}#${HOST_NAME}#" \
-        -e "s#\${HOST_PORT}#${HOST_PORT}#" \
-        -e "w/home/user/.ssh/config" \
-        /opt/docker/extension/config &&
     echo "${ORIGIN_ID_RSA}" > /home/user/.ssh/origin.id_rsa &&
     echo "${UPSTREAM_ID_RSA}" > /home/user/.ssh/upstream.id_rsa &&
     echo "${REPORT_ID_RSA}" > /home/user/.ssh/report.id_rsa &&
-    echo "${LIEUTENANT_AWS_PRIVATE_KEY}" > /home/user/.ssh/lieutenant-ec2.id_rsa &&
-    ssh-keyscan -p ${HOST_PORT} "${HOST_NAME}" >> /home/user/.ssh/known_hosts &&
-    ssh-keyscan $(aws ec2 describe-instances --filters Name=tag:moniker,Values=lieutenant Name=instance-state-name,Values=running --query "Reservations[*].Instances[*].PublicIpAddress" --output text) >> /home/user/.ssh/known_hosts &&
     ln -sf /home/user/.ssh /opt/docker/workspace/dot_ssh &&
     TEMP=$(mktemp -d) &&
     echo "${GPG_SECRET_KEY}" > ${TEMP}/gpg-secret-key &&
@@ -40,11 +28,5 @@ EOF
     pass git config user.email "${USER_EMAIL}" &&
     pass git remote add origin origin:${SECRETS_ORIGIN_ORGANIZATION}/${SECRETS_ORIGIN_REPOSITORY}.git &&
     echo "${ORIGIN_ID_RSA}" > /home/user/.ssh/origin_id_rsa &&
-    pass git fetch origin master &&
-    pass git checkout master &&
-    cp /opt/docker/extension/post-commit.sh ${HOME}/.password-store/.git/hooks/post-commit &&
-    chmod 0500 ${HOME}/.password-store/.git/hooks/post-commit &&
-    mkdir /opt/docker/workspace/ec2-user &&
-    sshfs -o allow_other lieutenant-ec2:/data /opt/docker/workspace/ec2-user/ &&
-    mkdir /home/user/bin &&
+    ln -sf /usr/bin/post-commit ${HOME}/.password-store/.git/hooks/post-commit &&
     ln -sf /home/user/bin /opt/docker/workspace
