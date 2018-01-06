@@ -28,5 +28,6 @@ EOF
     pass git config user.email "${USER_EMAIL}" &&
     pass git remote add origin origin:${SECRETS_ORIGIN_ORGANIZATION}/${SECRETS_ORIGIN_REPOSITORY}.git &&
     echo "${ORIGIN_ID_RSA}" > /home/user/.ssh/origin_id_rsa &&
+    cat /opt/docker/extension/config >> /home/user/.ssh/config &&
     ln -sf /usr/bin/post-commit ${HOME}/.password-store/.git/hooks/post-commit &&
     ln -sf /home/user/bin /opt/docker/workspace

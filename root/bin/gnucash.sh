@@ -38,6 +38,7 @@ SECURITY_GROUP=$(uuidgen) &&
             --count 1 \
             --instance-type t2.micro \
             --key-name $(aws ec2 import-key-pair --key-name ${KEY_NAME} --public-key-material "$(cat ${KEY_FILE}.pub)" --query "KeyName" --output text) \
+            --placement AvailabilityZone=$(aws ec2 describe-volumes --filters Name=tag:moniker,Values=lieutenant --query "Volumes[*].AvailabilityZone" --output text) \
             --tag-specifications "ResourceType=instance,Tags=[{Key=moniker,Value=lieutenant}]" \
             --query "Instances[0].InstanceId" \
             --output text) &&
