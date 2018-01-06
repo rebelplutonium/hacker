@@ -16,8 +16,8 @@ Port ${HOST_PORT}
 User git
 IdentityFile ~/.ssh/report.id_rsa
 
-Host lieutenant-ec2
-HostName 127.0.0.1
-User ec2-user
-IdentityFile ~/.ssh/lieutenant-ec2.id_rsa
+# Host lieutenant-ec2
+# HostName ${LIEUTENANT_PUBLIC_IP_ADDRESS}
+# User ec2-user
+# IdentityFile ${LIEUTENANT_IDENTITY_FILE}
 
