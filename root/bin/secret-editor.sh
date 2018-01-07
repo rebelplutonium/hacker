@@ -72,7 +72,7 @@ CLOUD9_PORT=16845 &&
         --env HOST_NAME="${HOST_NAME}" \
         --env HOST_PORT="${HOST_PORT}" \
         --env READ_WRITE="${READ_WRITE}" \
-        --env READ_ONLY="${READ_ONLY}"
+        --env READ_ONLY="${READ_ONLY}" \
         --label expiry=${EXPIRY} \
         rebelplutonium/secret-editor:1.0.0 &&
     docker network connect --alias ${PROJECT_NAME} ${EXTERNAL_NETWORK_NAME} $(cat ${CIDFILE}) &&
