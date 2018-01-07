@@ -4,18 +4,6 @@ Port ${HOST_PORT}
 User git
 IdentityFile ~/.ssh/origin.id_rsa
 
-Host upstream
-HostName ${HOST_NAME}
-Port ${HOST_PORT}
-User git
-IdentityFile ~/.ssh/upstream.id_rsa
-
-Host report
-HostName ${HOST_NAME}
-Port ${HOST_PORT}
-User git
-IdentityFile ~/.ssh/report.id_rsa
-
 # Host lieutenant-ec2
 # HostName ${LIEUTENANT_PUBLIC_IP_ADDRESS}
 # User ec2-user
