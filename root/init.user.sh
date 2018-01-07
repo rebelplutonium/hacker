@@ -30,4 +30,9 @@ EOF
     echo "${ORIGIN_ID_RSA}" > /home/user/.ssh/origin_id_rsa &&
     cat /opt/docker/extension/config >> /home/user/.ssh/config &&
     ln -sf /usr/bin/post-commit ${HOME}/.password-store/.git/hooks/post-commit &&
-    ln -sf /home/user/bin /opt/docker/workspace
+    ln -sf /home/user/bin /opt/docker/workspace &&
+    ls -1 /usr/local/bin | while read FILE
+    do
+        cp /usr/local/bin/${FILE} /home/user/bin/${FILE}.sh &&
+            chmod 0700 /home/user/bin/${FILE}.sh
+    done
