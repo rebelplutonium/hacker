@@ -6,6 +6,10 @@ SECURITY_GROUP=$(uuidgen) &&
     rm -f ${KEY_FILE} &&
     cleanup(){
         rm -f ${KEY_FILE} ${KEY_FILE}.pub &&
+            sed -i "s%^Host lieutenant-ec2\$%# Host lieutenant-ec2%" ${HOME}/.ssh/config &&
+            sed -i "s%^HostName $(aws ec2 describe-instances --filter Name=tag:moniker,Values=lieutenant Name=instance-state-name,Values=running --query "Reservations[*].Instances[*].PublicIpAddress" --output text)\$%# HostName \${LIEUTENANT_PUBLIC_IP_ADDRESS}%" ${HOME}/.ssh/config  &&
+            sed -i "s%^User ec2-user\$%# User ec2-user%" ${HOME}/.ssh/config &&
+            sed -i "s%^IdentityFile ${KEY_FILE}\$%# IdentityFile \${LIEUTENANT_IDENTITY_FILE}%" ${HOME}/.ssh/config &&
             aws \
                 ec2 \
                 wait \
@@ -16,10 +20,6 @@ SECURITY_GROUP=$(uuidgen) &&
                     --instance-ids $(aws ec2 describe-instances --filters Name=tag:moniker,Values=lieutenant Name=instance-state-name,Values=running --query "Reservations[0].Instances[*].InstanceId" --output text) \
                     --query "TerminatingInstances[*].InstanceId" \
                     --output text) &&
-            sed -i "s%Host lieutenant-ec2%# Host lieutenant-ec2%" ${HOME}/.ssh/config &&
-            sed -i "s%HostName $(aws ec2 describe-instances --filter Name=tag:moniker,Values=lieutenant Name=instance-state-name,Values=running --query "Reservations[*].Instances[*].PublicIpAddress" --output text)%# HostName \${LIEUTENANT_PUBLIC_IP_ADDRESS}%" ${HOME}/.ssh/config  &&
-            sed -i "s%User ec2-user%# User ec2-user%" ${HOME}/.ssh/config &&
-            sed -i "s%IdentityFile ${KEY_FILE}%# IdentityFile \${LIEUTENANT_IDENTITY_FILE}%" ${HOME}/.ssh/config &&
             aws ec2 delete-security-group --group-name ${SECURITY_GROUP} &&
             aws ec2 delete-key-pair --key-name ${KEY_NAME} &&
             rm -rf /opt/docker/workspace/lieutenant
@@ -51,10 +51,10 @@ SECURITY_GROUP=$(uuidgen) &&
         --query "Device" \
         --output text) &&
     aws ec2 authorize-security-group-ingress --group-name ${SECURITY_GROUP} --protocol tcp --port 22 --cidr 0.0.0.0/0 &&
-    sed -i "s%# Host lieutenant-ec2%Host lieutenant-ec2%" ${HOME}/.ssh/config &&
-    sed -i "s%# HostName \${LIEUTENANT_PUBLIC_IP_ADDRESS}%HostName $(aws ec2 describe-instances --filter Name=tag:moniker,Values=lieutenant Name=instance-state-name,Values=running --query "Reservations[*].Instances[*].PublicIpAddress" --output text)%" ${HOME}/.ssh/config &&
-    sed -i "s%# User ec2-user%User ec2-user%" ${HOME}/.ssh/config &&
-    sed -i "s%# IdentityFile \${LIEUTENANT_IDENTITY_FILE}%IdentityFile ${KEY_FILE}%" ${HOME}/.ssh/config &&
+    sed -i "s%^# Host lieutenant-ec2\$%Host lieutenant-ec2%" ${HOME}/.ssh/config &&
+    sed -i "s%^# HostName \${LIEUTENANT_PUBLIC_IP_ADDRESS}\$%HostName $(aws ec2 describe-instances --filter Name=tag:moniker,Values=lieutenant Name=instance-state-name,Values=running --query "Reservations[*].Instances[*].PublicIpAddress" --output text)%" ${HOME}/.ssh/config &&
+    sed -i "s%^# User ec2-user%User ec2-user\$%" ${HOME}/.ssh/config &&
+    sed -i "s%^# IdentityFile \${LIEUTENANT_IDENTITY_FILE}%IdentityFile ${KEY_FILE}\$%" ${HOME}/.ssh/config &&
     sleep 15s &&
     ssh-keyscan $(aws ec2 describe-instances --filter Name=tag:moniker,Values=lieutenant Name=instance-state-name,Values=running --query "Reservations[*].Instances[*].PublicIpAddress" --output text) >> ${HOME}/.ssh/known_hosts &&
     ssh lieutenant-ec2 sudo mkdir /data &&
