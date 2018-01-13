@@ -10,4 +10,7 @@ dnf update --assumeyes &&
     dnf install --assumeyes paperkey a2ps &&
     dnf install --assumeyes gnucash fuse-sshfs &&
     sed -i "s+^# user_allow_other\$+user_allow_other+" /etc/fuse.conf &&
+    mkdir /srv/ids &&
+    mkdir /srv/ids/{containers,images,volumes,networks} &&
+    chown user:user /srv/{containers,images,volumes,networks} &&
     dnf clean all
