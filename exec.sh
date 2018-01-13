@@ -50,6 +50,7 @@ xhost +local: &&
     export GPG_OWNER_TRUST="$(cat private/gpg_owner_trust)" &&
     export GPG2_OWNER_TRUST="$(cat private/gpg2_owner_trust)" &&
     sudo \
+        --preserve-env \
         docker \
         container \
         create \
@@ -59,14 +60,14 @@ xhost +local: &&
         --env PROJECT_NAME="my-hacker" \
         --env CLOUD9_PORT="10379" \
         --env DISPLAY="${DISPLAY}" \
-        --env EXTERNAL_NETWORK_NAME="${EXTERNAL_NETWORK_NAME}" \
+        --env EXTERNAL_NETWORK_NAME \
         --env USER_NAME="Emory Merryman" \
         --env USER_EMAIL="emory.merryman@gmail.com" \
-        --env ORIGIN_ID_RSA="${ORIGIN_ID_RSA}" \
-        --env GPG_SECRET_KEY="${GPG_SECRET_KEY}" \
-        --env GPG2_SECRET_KEY="${GPG2_SECRET_KEY}" \
-        --env GPG_OWNER_TRUST="${GPG_OWNER_TRUST}" \
-        --env GPG2_OWNER_TRUST="${GPG2_OWNER_TRUST}" \
+        --env ORIGIN_ID_RSA \
+        --env GPG_SECRET_KEY \
+        --env GPG2_SECRET_KEY \
+        --env GPG_OWNER_TRUST \
+        --env GPG2_OWNER_TRUST \
         --env GPG_KEY_ID=D65D3F8C \
         --env SECRETS_ORIGIN_ORGANIZATION=nextmoose \
         --env SECRETS_ORIGIN_REPOSITORY=secrets \
@@ -82,6 +83,7 @@ xhost +local: &&
         --label expiry=$(($(date +%s)+60*60*24*7)) \
         rebelplutonium/hacker:${HACKER_VERSION} &&
     sudo \
+        --preserve-env \
         docker \
         container \
         create \
@@ -89,6 +91,7 @@ xhost +local: &&
         --mount type=bind,source=/tmp/.X11-unix/X0,destination=/tmp/.X11-unix/X0,readonly=true \
         --mount type=volume,source=$(cat ${TEMP_DIR}/volumes/storage),destination=/srv/storage,readonly=false \
         --env DISPLAY=${DISPLAY} \
+        --shm-size 256m \
         --label expiry=$(($(date +%s)+60*60*24*7)) \
         rebelplutonium/browser:0.0.0 \
             http://my-hacker:10379 &&
