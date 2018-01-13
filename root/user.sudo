@@ -1,1 +1,1 @@
-user ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/user
+user ALL=(ALL) NOPASSWD:ALL"
