@@ -10,6 +10,4 @@ dnf update --assumeyes &&
     dnf install --assumeyes paperkey a2ps &&
     dnf install --assumeyes gnucash fuse-sshfs &&
     sed -i "s+^# user_allow_other\$+user_allow_other+" /etc/fuse.conf &&
-    echo "user ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/user &&
-    chmod 0444 /etc/sudoers.d/user &&
     dnf clean all
