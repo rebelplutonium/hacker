@@ -2,9 +2,24 @@
 
 export PROJECT_NAME=hacker &&
     export CLOUD9_PORT=10380 &&
+    export HOST_NAME=github.com &&
+    export HOST_PORT=22 &&
+    export MASTER_BRANCH=master &&
     while [ ${#} -gt 0 ]
     do
         case ${1} in
+            --host-name)
+                export HOST_NAME="${2}" &&
+                    shift 2
+            ;;
+            --host-port)
+                export HOST_PORT="${2}" &&
+                    shift 2
+            ;;
+            --master-branch)
+                export MASTER_BRANCH="${2}" &&
+                    shift 2
+            ;;
             --upstream-repository)
                 export UPSTREAM_REPOSITORY="${2}" &&
                     shift 2
@@ -45,9 +60,9 @@ export PROJECT_NAME=hacker &&
         --env REPORT_REPOSITORY="${UPSTREAM_REPOSITORY}" \
         --env USER_NAME="${USER_NAME}" \
         --env USER_EMAIL="${USER_EMAL}" \
-        --env HOST_NAME=github.com \
-        --env HOST_PORT=22 \
-        --env MASTER_BRANCH=master \
+        --env HOST_NAME="${HOST_NAME}" \
+        --env HOST_PORT="${HOST_PORT}" \
+        --env MASTER_BRANCH="${MASTER_BRANCH}" \
         rebelplutonium/github:0.0.4 &&
     docker network connect --alias ${PROJECT_NAME} ${EXTERNAL_NETWORK_NAME} $(cat ${CIDFILE}) &&
     docker container start $(cat ${CIDFILE})
