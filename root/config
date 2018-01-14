@@ -1,6 +1,12 @@
+Host upstream
+HostName github.com
+Port 22
+User git
+IdentityFile ~/.ssh/upstream.id_rsa
+
 Host origin
-HostName ${HOST_NAME}
-Port ${HOST_PORT}
+HostName github.com
+Port 22
 User git
 IdentityFile ~/.ssh/origin.id_rsa
 
