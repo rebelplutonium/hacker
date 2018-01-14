@@ -32,6 +32,10 @@ export PROJECT_NAME=hacker &&
                 export CLOUD9_PORT="${2}" &&
                     shift 2
             ;;
+            --checkout-branch)
+                export CHECKOUT_BRANCH="${2}" &&
+                    shift 2
+            ;;
             *)
                 echo Unsupported Option &&
                     echo ${0} &&
@@ -63,6 +67,7 @@ export PROJECT_NAME=hacker &&
         --env HOST_NAME="${HOST_NAME}" \
         --env HOST_PORT="${HOST_PORT}" \
         --env MASTER_BRANCH="${MASTER_BRANCH}" \
+        --env CHECKOUT_BRANCH="${CHECKOUT_BRANCH}" \
         rebelplutonium/github:0.0.4 &&
     docker network connect --alias ${PROJECT_NAME} ${EXTERNAL_NETWORK_NAME} $(cat ${CIDFILE}) &&
     docker container start $(cat ${CIDFILE})
