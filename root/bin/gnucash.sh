@@ -1,15 +1,12 @@
 #!/bin/sh
 
-SECURITY_GROUP=$(uuidgen) &&
+DOT_SSH_CONFIG_FILE=$(mktemp ${HOME}/.ssh/config.d/XXXXXXXX) &&
+    SECURITY_GROUP=$(uuidgen) &&
     KEY_NAME=$(uuidgen) &&
     KEY_FILE=$(mktemp ${HOME}/.ssh/XXXXXXXX.id_rsa) &&
     rm -f ${KEY_FILE} &&
     cleanup(){
-        rm -f ${KEY_FILE} ${KEY_FILE}.pub &&
-            sed -i "s%^Host lieutenant-ec2\$%# Host lieutenant-ec2%" ${HOME}/.ssh/config &&
-            sed -i "s%^HostName $(aws ec2 describe-instances --filter Name=tag:moniker,Values=lieutenant Name=instance-state-name,Values=running --query "Reservations[*].Instances[*].PublicIpAddress" --output text)\$%# HostName \${LIEUTENANT_PUBLIC_IP_ADDRESS}%" ${HOME}/.ssh/config  &&
-            sed -i "s%^User ec2-user\$%# User ec2-user%" ${HOME}/.ssh/config &&
-            sed -i "s%^IdentityFile ${KEY_FILE}\$%# IdentityFile \${LIEUTENANT_IDENTITY_FILE}%" ${HOME}/.ssh/config &&
+        rm -f ${DOT_SSH_CONFIG_FILE} ${KEY_FILE} ${KEY_FILE}.pub &&
             aws \
                 ec2 \
                 wait \
@@ -51,10 +48,13 @@ SECURITY_GROUP=$(uuidgen) &&
         --query "Device" \
         --output text) &&
     aws ec2 authorize-security-group-ingress --group-name ${SECURITY_GROUP} --protocol tcp --port 22 --cidr 0.0.0.0/0 &&
-    sed -i "s%^# Host lieutenant-ec2\$%Host lieutenant-ec2%" ${HOME}/.ssh/config &&
-    sed -i "s%^# HostName \${LIEUTENANT_PUBLIC_IP_ADDRESS}\$%HostName $(aws ec2 describe-instances --filter Name=tag:moniker,Values=lieutenant Name=instance-state-name,Values=running --query "Reservations[*].Instances[*].PublicIpAddress" --output text)%" ${HOME}/.ssh/config &&
-    sed -i "s%^# User ec2-user%User ec2-user\$%" ${HOME}/.ssh/config &&
-    sed -i "s%^# IdentityFile \${LIEUTENANT_IDENTITY_FILE}%IdentityFile ${KEY_FILE}\$%" ${HOME}/.ssh/config &&
+    (cat > ${DOT_SSH_CONFIG_FILE} <<EOF
+Host lieutenant-ec2
+HostName $(aws ec2 describe-instances --filter Name=tag:moniker,Values=lieutenant Name=instance-state-name,Values=running --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
+User ec2-user
+IdentityFile ${KEYFILE}
+EOF
+    ) &&
     sleep 15s &&
     ssh-keyscan $(aws ec2 describe-instances --filter Name=tag:moniker,Values=lieutenant Name=instance-state-name,Values=running --query "Reservations[*].Instances[*].PublicIpAddress" --output text) >> ${HOME}/.ssh/known_hosts &&
     ssh lieutenant-ec2 sudo mkdir /data &&
