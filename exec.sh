@@ -72,7 +72,7 @@ xhost +local: &&
         --env GPG_KEY_ID=D65D3F8C \
         --env SECRETS_ORIGIN_ORGANIZATION=nextmoose \
         --env SECRETS_ORIGIN_REPOSITORY=secrets \
-        --env EXTERNAL_IDS_VOLUME=$(cat ${IDS}/volumes/ids) \
+        --env EXTERNAL_DOCKER_VOLUME=$(cat ${IDS}/volumes/docker) \
         --privileged \
         --mount type=bind,source=/tmp/.X11-unix/X0,destination=/tmp/.X11-unix/X0,readonly=true \
         --mount type=bind,source=/var/run/docker.sock,destination=/var/run/docker.sock,readonly=true \
