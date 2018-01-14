@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd $(mktemp -d) &&
+cd $(mktemp -d /srv/docker/workspace/XXXXXXXX) &&
     git init &&
     git remote add origin https://github.com/nextmoose/${1}.git &&
     git fetch origin ${2} &&

@@ -43,7 +43,7 @@ xhost +local: &&
         esac
     done &&
     sudo /usr/bin/docker volume create --label expiry=$(($(date +%s)+60*60*24*7)) > ${IDS}/volumes/storage &&
-    sudo /usr/bin/docker volume create --label expiry=$(($(date +%s)+60*60*24*7)) > ${IDS}/volumes/ids &&
+    sudo /usr/bin/docker volume create --label expiry=$(($(date +%s)+60*60*24*7)) > ${IDS}/volumes/docker &&
     sudo /usr/bin/docker network create --label expiry=$(($(date +%s)+60*60*24*7)) $(uuidgen) > ${IDS}/networks/main &&
     export ORIGIN_ID_RSA="$(cat private/origin.id_rsa)" &&
     export GPG_SECRET_KEY="$(cat private/gpg_secret_key)" &&
@@ -80,7 +80,7 @@ xhost +local: &&
         --mount type=bind,source=/media,destination=/srv/media,readonly=false \
         --mount type=bind,source=/home,destination=/srv/home,readonly=false \
         --mount type=volume,source=$(cat ${IDS}/volumes/storage),destination=/srv/storage,readonly=false \
-        --mount type=volume,source=$(cat ${IDS}/volumes/ids),destination=/srv/ids,readonly=false \
+        --mount type=volume,source=$(cat ${IDS}/volumes/docker),destination=/srv/docker,readonly=false \
         --label expiry=$(($(date +%s)+60*60*24*7)) \
         rebelplutonium/hacker:${HACKER_VERSION} &&
     sudo \

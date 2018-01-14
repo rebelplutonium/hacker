@@ -1,6 +1,7 @@
 #!/bin/sh
 
-CIDFILE=$(mktemp /srv/ids/containers/XXXXXXXX) &&
+cd $(mktemp /srv/docker/workspace/XXXXXXXX) &&
+    CIDFILE=$(mktemp /srv/docker/containers/XXXXXXXX) &&
     export PROJECT_NAME=hacker4 &&
     rm ${CIDFILE} &&
     docker \
