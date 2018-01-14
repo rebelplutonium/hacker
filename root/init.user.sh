@@ -15,6 +15,7 @@ TEMP=$(mktemp -d) &&
     pass git config user.name "${USER_NAME}" &&
     pass git config user.email "${USER_EMAIL}" &&
     pass git remote add origin origin:${SECRETS_ORIGIN_ORGANIZATION}/${SECRETS_ORIGIN_REPOSITORY}.git &&
+    ssh-keyscan github.com >> ${HOME}/.ssh/known_hosts &&
     echo "${ORIGIN_ID_RSA}" > /home/user/.ssh/origin.id_rsa &&
     cat /opt/docker/extension/config >> /home/user/.ssh/config &&
     ln -sf /usr/bin/post-commit ${HOME}/.password-store/.git/hooks/post-commit &&
@@ -24,4 +25,6 @@ TEMP=$(mktemp -d) &&
     do
         cp /usr/local/bin/${FILE} /home/user/bin/${FILE}.sh &&
             chmod 0700 /home/user/bin/${FILE}.sh
-    done
+    done &&
+    pass git fetch origin master &&
+    pass git checkout master

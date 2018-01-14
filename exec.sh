@@ -44,6 +44,7 @@ xhost +local: &&
     done &&
     sudo /usr/bin/docker volume create --label expiry=$(($(date +%s)+60*60*24*7)) > ${IDS}/volumes/storage &&
     sudo /usr/bin/docker volume create --label expiry=$(($(date +%s)+60*60*24*7)) > ${IDS}/volumes/ids &&
+    sudo /usr/bin/docker network create --label expiry=$(($(date +%s)+60*60*24*7)) $(uuidgen) > ${IDS}/networks/main &&
     export ORIGIN_ID_RSA="$(cat private/origin.id_rsa)" &&
     export GPG_SECRET_KEY="$(cat private/gpg_secret_key)" &&
     export GPG2_SECRET_KEY="$(cat private/gpg2_secret_key)" &&
@@ -95,7 +96,6 @@ xhost +local: &&
         --label expiry=$(($(date +%s)+60*60*24*7)) \
         rebelplutonium/browser:0.0.0 \
             http://my-hacker:10379 &&
-    sudo /usr/bin/docker network create --label expiry=$(($(date +%s)+60*60*24*7)) $(uuidgen) > ${IDS}/networks/main &&
     sudo /usr/bin/docker network connect $(cat ${IDS}/networks/main) $(cat ${IDS}/containers/browser) &&
     sudo /usr/bin/docker network connect --alias my-hacker $(cat ${IDS}/networks/main) $(cat ${IDS}/containers/hacker) &&
     sudo /usr/bin/docker container start $(cat ${IDS}/containers/browser) &&
