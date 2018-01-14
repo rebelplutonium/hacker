@@ -27,4 +27,5 @@ TEMP=$(mktemp -d) &&
             chmod 0700 /home/user/bin/${FILE}.sh
     done &&
     pass git fetch origin master &&
-    pass git checkout master
+    pass git checkout master &&
+    ln -sf /srv/docker /opt/docker/workspace 

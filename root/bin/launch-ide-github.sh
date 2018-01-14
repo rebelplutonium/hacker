@@ -1,15 +1,36 @@
 #!/bin/sh
 
-cd $(mktemp /srv/docker/workspace/XXXXXXXX) &&
-    CIDFILE=$(mktemp /srv/docker/containers/XXXXXXXX) &&
+export PROJECT_NAME=github &&
+    export CLOUD9_PORT=10380 &&
+    while [ ${#} -gt 0 ]
+    do
+        case ${1} in
+            --project-name)
+                export PROJECT_NAME="${2}" &&
+                    shift 2
+            ;;
+            --cloud9-port)
+                export CLOUD9_PORT="${2}" &&
+                    shift 2
+            ;;
+            *)
+                echo Unsupported Option &&
+                    echo ${0} &&
+                    echo ${@} &&
+                    exit 64
+            ;;
+        esac
+    done &&
+    cd $(mktemp -d /srv/docker/workspace/XXXXXXXX) &&
+    CIDFILE=$(generate-container-id) &&
     export PROJECT_NAME=hacker4 &&
     rm ${CIDFILE} &&
     docker \
         container \
         create \
         --cidfile ${CIDFILE} \
-        --env PROJECT_NAME=${PROJECT_NAME} \
-        --env CLOUD9_PORT=10380 \
+        --env PROJECT_NAME="${PROJECT_NAME}" \
+        --env CLOUD9_PORT="${CLOUD9_PORT}" \
         --env UPSTREAM_ID_RSA="$(pass show upstream.id_rsa)" \
         --env UPSTREAM_ORGANIZATION=rebelplutonium \
         --env UPSTREAM_REPOSITORY=hacker \
