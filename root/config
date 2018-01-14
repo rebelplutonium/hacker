@@ -1,11 +1,7 @@
 Host origin
-HostName ${HOST_NAME}
-Port ${HOST_PORT}
+HostName github.com
+Port 22
 User git
 IdentityFile ~/.ssh/origin.id_rsa
 
-# Host lieutenant-ec2
-# HostName ${LIEUTENANT_PUBLIC_IP_ADDRESS}
-# User ec2-user
-# IdentityFile ${LIEUTENANT_IDENTITY_FILE}
 
