@@ -52,7 +52,7 @@ DOT_SSH_CONFIG_FILE=$(mktemp ${HOME}/.ssh/config.d/XXXXXXXX) &&
 Host lieutenant-ec2
 HostName $(aws ec2 describe-instances --filter Name=tag:moniker,Values=lieutenant Name=instance-state-name,Values=running --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
 User ec2-user
-IdentityFile ${KEYFILE}
+IdentityFile ${KEY_FILE}
 EOF
     ) &&
     sleep 15s &&
