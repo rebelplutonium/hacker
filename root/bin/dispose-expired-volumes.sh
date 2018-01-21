@@ -1,6 +1,6 @@
 #!/bin/sh
 
-sudo /usr/bin/docker volume ls --quiet --filter dangling=true --label=expiry | while read VOLUME
+sudo /usr/bin/docker volume ls --quiet --filter dangling=true --filter label=expiry | while read VOLUME
 do
     if [ -z "$(sudo /usr/bin/docker volume inspect --format \"{{.Labels.expiry}}\" ${VOLUME})" ] || [ $(sudo /usr/bin/docker volume inspect --format "{{.Labels.expiry}}" ${VOLUME}) -lt $(date +%s) ]
     then

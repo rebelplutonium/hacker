@@ -34,7 +34,7 @@ WORKSPACE=$(mktemp -d /srv/docker/workspace/XXXXXXXX) &&
             --image-id ami-55ef662f \
             --security-group-ids $(aws ec2 create-security-group --group-name ${SECURITY_GROUP} --description "security group for the gitlab environment in EC2" --query "GroupId" --output text) \
             --count 1 \
-            --instance-type t2.micro \
+            --instance-type t2.medium \
             --key-name $(aws ec2 import-key-pair --key-name ${KEY_NAME} --public-key-material "$(cat ${KEY_FILE}.pub)" --query "KeyName" --output text) \
             --placement AvailabilityZone=$(aws ec2 describe-volumes --filters Name=tag:moniker,Values=gitlab --query "Volumes[*].AvailabilityZone" --output text) \
             --tag-specifications "ResourceType=instance,Tags=[{Key=moniker,Value=gitlab}]" \

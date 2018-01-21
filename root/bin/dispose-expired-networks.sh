@@ -1,6 +1,6 @@
 #!/bin/sh
 
-sudo /usr/bin/docker network ls --quiet --label=expiry | while read NETWORK
+sudo /usr/bin/docker network ls --quiet --filter label=expiry | while read NETWORK
 do
     if [ -z $(sudo /usr/bin/docker container ls --quiet --filter --all network=${NETWORK}) ]
     then

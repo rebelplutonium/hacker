@@ -44,7 +44,7 @@ CLOUD9_PORT=16845 &&
             ;;
         esac
     done &&
-    CIDFILE=$(mktemp) &&
+    CIDFILE=$(generate-container-id) &&
     rm -f ${CIDFILE} &&
     cleanup(){
         docker container stop $(cat ${CIDFILE}) && docker container rm --volumes $(cat ${CIDFILE})

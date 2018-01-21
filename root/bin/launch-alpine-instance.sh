@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CIDFILE=$(mktemp /srv/ids/containers/XXXXXXXX) &&
+CIDFILE=$(generate-container-id) &&
     docker \
         container \
         create \
