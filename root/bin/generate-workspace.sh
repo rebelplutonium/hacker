@@ -1,3 +1,3 @@
 #!/bin/sh
 
-mktemp /srv/docker/workspace/XXXXXXXX
+mktemp -d /srv/docker/workspace/XXXXXXXX
