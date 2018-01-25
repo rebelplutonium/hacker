@@ -8,7 +8,7 @@ launch-ide-next \
     --upstream-organization rebelplutonium \
     --upstream-repository hacker \
     --origin-id-rsa origin.id_rsa \
-    --origin-organization nextmooose \
+    --origin-organization nextmoose \
     --origin-repository hacker \
     --report-id-rsa report.id_rsa \
     --report-organization rebelplutonium \
