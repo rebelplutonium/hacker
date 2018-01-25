@@ -28,6 +28,14 @@ CLOUD9_PORT=16845 &&
                 export HOST_PORT="${2}" &&
                     shift 2
             ;;
+            --user-name)
+                export USER_NAME="${2}" &&
+                    shift 2
+            ;;
+            --user-email)
+                export USER_NAME="${2}" &&
+                    shift 2
+            ;;
             --read-write)
                 export READ_WRITE=$(uuidgen) &&
                     shift
@@ -71,6 +79,8 @@ CLOUD9_PORT=16845 &&
         --env ORIGIN_ID_RSA="${ORIGIN_ID_RSA}" \
         --env HOST_NAME="${HOST_NAME}" \
         --env HOST_PORT="${HOST_PORT}" \
+        --env USER_NAME="${USER_NAME}" \
+        --env USER_EMAIL="${USER_EMAIL}" \
         --env READ_WRITE="${READ_WRITE}" \
         --env READ_ONLY="${READ_ONLY}" \
         --label expiry=${EXPIRY} \
