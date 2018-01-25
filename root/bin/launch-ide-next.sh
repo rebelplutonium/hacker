@@ -84,6 +84,18 @@ export PROJECT_NAME=hacker &&
                 export GPG2_OWNER_TRUST="${2}" &&
                     shift 2
             ;;
+            --gpg-key-id)
+                export GPG_KEY_ID="${2}" &&
+                    shift 2
+            ;;
+            --user-name)
+                export USER_NAME="${2}" &&
+                    shift 2
+            ;;
+            --user-email)
+                export USER_EMAIL="${2}" &&
+                    shift 2
+            ;;
             *)
                 echo Unsupported Option &&
                     echo ${0} &&
@@ -120,6 +132,9 @@ export PROJECT_NAME=hacker &&
         --env GPG2_SECRET_KEY="$(pass show ${GPG2_SECRET_KEY})" \
         --env GPG_OWNER_TRUST="$(pass show ${GPG_ONWER_TRUST})" \
         --env GPG2_OWNER_TRUST="$(pass show ${GPG2_ONWER_TRUST})" \
+        --env GPG_KEY_ID="$(pass show ${GPG_KEY_ID})" \
+        --env USER_NAME="${USER_NAME}" \
+        --env USER_EMAIL="${USER_EMAIL}" \
         rebelplutonium/github:0.0.8 &&
     docker network connect --alias ${PROJECT_NAME} ${EXTERNAL_NETWORK_NAME} $(cat ${CIDFILE}) &&
     docker container start $(cat ${CIDFILE})

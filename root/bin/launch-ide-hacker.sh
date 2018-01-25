@@ -18,4 +18,5 @@ launch-ide-next \
     --gpg2-secret-key gpg2.secret.key \
     --gpg-owner-trust gpg.owner.trust \
     --gpg2-owner-trust gpg2.owner.trust \
+    --gpg-key-id gpg.key.id \
     --project-name ${1}
