@@ -6,23 +6,23 @@ WORKSPACE=$(mktemp -d /srv/docker/workspace/XXXXXXXX) &&
     KEY_NAME=$(uuidgen) &&
     KEY_FILE=$(mktemp ${HOME}/.ssh/XXXXXXXX.id_rsa) &&
     rm -f ${KEY_FILE} &&
-    cleanup(){
-        rm -f ${DOT_SSH_CONFIG_FILE} ${KEY_FILE} ${KEY_FILE}.pub &&
-            aws \
-                ec2 \
-                wait \
-                instance-terminated \
-                --instance-ids $(aws \
-                    ec2 \
-                    terminate-instances \
-                    --instance-ids $(aws ec2 describe-instances --filters Name=tag:moniker,Values=gitlab Name=instance-state-name,Values=running --query "Reservations[0].Instances[*].InstanceId" --output text) \
-                    --query "TerminatingInstances[*].InstanceId" \
-                    --output text) &&
-            aws ec2 delete-security-group --group-name ${SECURITY_GROUP} &&
-            aws ec2 delete-key-pair --key-name ${KEY_NAME} &&
-            rm -rf ${WORKSPACE}
-    } &&
-    trap cleanup EXIT &&
+    # cleanup(){
+    #     rm -f ${DOT_SSH_CONFIG_FILE} ${KEY_FILE} ${KEY_FILE}.pub &&
+    #         aws \
+    #             ec2 \
+    #             wait \
+    #             instance-terminated \
+    #             --instance-ids $(aws \
+    #                 ec2 \
+    #                 terminate-instances \
+    #                 --instance-ids $(aws ec2 describe-instances --filters Name=tag:moniker,Values=gitlab Name=instance-state-name,Values=running --query "Reservations[0].Instances[*].InstanceId" --output text) \
+    #                 --query "TerminatingInstances[*].InstanceId" \
+    #                 --output text) &&
+    #         aws ec2 delete-security-group --group-name ${SECURITY_GROUP} &&
+    #         aws ec2 delete-key-pair --key-name ${KEY_NAME} &&
+    #         rm -rf ${WORKSPACE}
+    # } &&
+    # trap cleanup EXIT &&
     ssh-keygen -f ${KEY_FILE} -C "temporary gitlab-ec2" -P "" &&
     aws \
         ec2 \
@@ -40,6 +40,7 @@ WORKSPACE=$(mktemp -d /srv/docker/workspace/XXXXXXXX) &&
             --tag-specifications "ResourceType=instance,Tags=[{Key=moniker,Value=gitlab}]" \
             --query "Instances[0].InstanceId" \
             --output text) &&
+    sleep 15s &&
     DEVICE=$(aws \
         ec2 \
         attach-volume \
@@ -54,11 +55,38 @@ Host gitlab-ec2
 HostName $(aws ec2 describe-instances --filter Name=tag:moniker,Values=gitlab Name=instance-state-name,Values=running --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
 User ec2-user
 IdentityFile ${KEY_FILE}
+LocalForward 0.0.0.0:10727 127.0.0.1:12073
+LocalForward 0.0.0.0:19129 127.0.0.1:14465
+LocalForward 0.0.0.0:18712 127.0.0.1:16955
+ControlMaster auto
+ControlPath ~/.ssh/ec2-user.%h-%p-%r.ctrl_path
 EOF
     ) &&
     sleep 15s &&
     ssh-keyscan $(aws ec2 describe-instances --filter Name=tag:moniker,Values=gitlab Name=instance-state-name,Values=running --query "Reservations[*].Instances[*].PublicIpAddress" --output text) >> ${HOME}/.ssh/known_hosts &&
-    ssh gitlab-ec2 sudo mkdir /data &&
-    ssh gitlab-ec2 sudo mount ${DEVICE} /data &&
-    echo "find /dev/disk/by-uuid/ -mindepth 1 | while read FILE; do [ \$(readlink -f \${FILE}) == \"${DEVICE}\" ] && basename \${FILE} ; done | while read UUID; do echo \"UUID=\${UUID}       /data   ext4    defaults,nofail        0       2\" | sudo tee --append /etc/fstab ; done" | ssh gitlab-ec2 sh &&
-    sshfs -o allow_other gitlab-ec2:/data ${WORKSPACE}
+    ssh gitlab-ec2 sudo mkdir /srv/gitlab &&
+    ssh gitlab-ec2 sudo mount ${DEVICE} /srv/gitlab &&
+    echo "find /dev/disk/by-uuid/ -mindepth 1 | while read FILE; do [ \$(readlink -f \${FILE}) == \"${DEVICE}\" ] && basename \${FILE} ; done | while read UUID; do echo \"UUID=\${UUID}       /srv/data   ext4    defaults,nofail        0       2\" | sudo tee --append /etc/fstab ; done" | ssh gitlab-ec2 sh &&
+    mkdir -p /srv/gitlab/config &&
+    mkdir -p /srv/gitlab/logs &&
+    mkdir -p /srv/gitlab/data &&
+    ssh gitlab-ec2 sudo yum update --assumeyes &&
+    ssh gitlab-ec2 sudo yum install --assumeyes docker &&
+    ssh gitlab-ec2 sudo service docker start &&
+    ssh gitlab-ec2 sudo service docker enable &&
+    ssh \
+        gitlab-ec2 \
+        sudo \
+        docker \
+        container \
+        run \
+        --detach \
+        --publish 127.0.0.1:12073:443 \
+        --publish 127.0.0.1:14465:80 \
+        --publish 127.0.0.1:16955:22 \
+        --restart always \
+        --volume /srv/gitlab/config:/etc/gitlab \
+        --volume /srv/gitlab/logs:/var/log/gitlab \
+        --volume /srv/gitlab/data:/var/opt/gitlab \
+        gitlab/gitlab-ce:10.4.0-ce.0 &&
+    ssh gitlab-ec2
