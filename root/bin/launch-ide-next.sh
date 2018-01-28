@@ -25,7 +25,7 @@ export PROJECT_NAME=hacker &&
                     shift 2
             ;;
             --upstream-organization)
-                export UPSTREAM_REPOSITORY="${2}" &&
+                export UPSTREAM_ORGANIZATION="${2}" &&
                     shift 2
             ;;
             --upstream-repository)
@@ -37,11 +37,11 @@ export PROJECT_NAME=hacker &&
                     shift 2
             ;;
             --origin-organization)
-                export UPSTREAM_REPOSITORY="${2}" &&
+                export ORIGIN_ORGANIZATION="${2}" &&
                     shift 2
             ;;
             --origin-repository)
-                export UPSTREAM_REPOSITORY="${2}" &&
+                export ORIGIN_REPOSITORY="${2}" &&
                     shift 2
             ;;
             --report-id-rsa)
@@ -49,11 +49,11 @@ export PROJECT_NAME=hacker &&
                     shift 2
             ;;
             --report-organization)
-                export UPSTREAM_REPOSITORY="${2}" &&
+                export REPORT_ORGANIZATION="${2}" &&
                     shift 2
             ;;
             --report-repository)
-                export UPSTREAM_REPOSITORY="${2}" &&
+                export REPORT_REPOSITORY="${2}" &&
                     shift 2
             ;;
             --project-name)
