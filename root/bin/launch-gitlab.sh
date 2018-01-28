@@ -1,28 +1,28 @@
 #!/bin/sh
 
-WORKSPACE=$(mktemp -d /srv/docker/workspace/XXXXXXXX) &&
+WORKSPACE=$(generate-workspace) &&
     DOT_SSH_CONFIG_FILE=$(mktemp ${HOME}/.ssh/config.d/XXXXXXXX) &&
     SECURITY_GROUP=$(uuidgen) &&
     KEY_NAME=$(uuidgen) &&
     KEY_FILE=$(mktemp ${HOME}/.ssh/XXXXXXXX.id_rsa) &&
     rm -f ${KEY_FILE} &&
-    # cleanup(){
-    #     rm -f ${DOT_SSH_CONFIG_FILE} ${KEY_FILE} ${KEY_FILE}.pub &&
-    #         aws \
-    #             ec2 \
-    #             wait \
-    #             instance-terminated \
-    #             --instance-ids $(aws \
-    #                 ec2 \
-    #                 terminate-instances \
-    #                 --instance-ids $(aws ec2 describe-instances --filters Name=tag:moniker,Values=gitlab Name=instance-state-name,Values=running --query "Reservations[0].Instances[*].InstanceId" --output text) \
-    #                 --query "TerminatingInstances[*].InstanceId" \
-    #                 --output text) &&
-    #         aws ec2 delete-security-group --group-name ${SECURITY_GROUP} &&
-    #         aws ec2 delete-key-pair --key-name ${KEY_NAME} &&
-    #         rm -rf ${WORKSPACE}
-    # } &&
-    # trap cleanup EXIT &&
+    cleanup(){
+        rm -f ${DOT_SSH_CONFIG_FILE} ${KEY_FILE} ${KEY_FILE}.pub &&
+            aws \
+                ec2 \
+                wait \
+                instance-terminated \
+                --instance-ids $(aws \
+                    ec2 \
+                    terminate-instances \
+                    --instance-ids $(aws ec2 describe-instances --filters Name=tag:moniker,Values=gitlab Name=instance-state-name,Values=running --query "Reservations[0].Instances[*].InstanceId" --output text) \
+                    --query "TerminatingInstances[*].InstanceId" \
+                    --output text) &&
+            aws ec2 delete-security-group --group-name ${SECURITY_GROUP} &&
+            aws ec2 delete-key-pair --key-name ${KEY_NAME} &&
+            rm -rf ${WORKSPACE}
+    } &&
+    trap cleanup EXIT &&
     ssh-keygen -f ${KEY_FILE} -C "temporary gitlab-ec2" -P "" &&
     aws \
         ec2 \
@@ -67,19 +67,16 @@ EOF
     ssh gitlab-ec2 sudo mkdir /srv/gitlab &&
     ssh gitlab-ec2 sudo mount ${DEVICE} /srv/gitlab &&
     echo "find /dev/disk/by-uuid/ -mindepth 1 | while read FILE; do [ \$(readlink -f \${FILE}) == \"${DEVICE}\" ] && basename \${FILE} ; done | while read UUID; do echo \"UUID=\${UUID}       /srv/data   ext4    defaults,nofail        0       2\" | sudo tee --append /etc/fstab ; done" | ssh gitlab-ec2 sh &&
-    mkdir -p /srv/gitlab/config &&
-    mkdir -p /srv/gitlab/logs &&
-    mkdir -p /srv/gitlab/data &&
     ssh gitlab-ec2 sudo yum update --assumeyes &&
     ssh gitlab-ec2 sudo yum install --assumeyes docker &&
     ssh gitlab-ec2 sudo service docker start &&
-    ssh gitlab-ec2 sudo service docker enable &&
     ssh \
         gitlab-ec2 \
         sudo \
         docker \
         container \
-        run \
+        create \
+        --name gitlab \
         --detach \
         --publish 127.0.0.1:12073:443 \
         --publish 127.0.0.1:14465:80 \
@@ -89,4 +86,30 @@ EOF
         --volume /srv/gitlab/logs:/var/log/gitlab \
         --volume /srv/gitlab/data:/var/opt/gitlab \
         gitlab/gitlab-ce:10.4.0-ce.0 &&
-    ssh gitlab-ec2
+    ssh \
+        gitlab-ec2 \
+        sudo \
+        docker \
+        container \
+        create \
+        --detach \
+        --name docker \
+        --privileged \
+        docker:17.12.0-dind &&
+    ssh \
+        gitlab-ec2 \
+        sudo \
+        docker \
+        create \
+        --detach \
+        --name gitlab-runner \
+        --restart always \
+        --volume /srv/gitlab/runner:/etc/gitlab-runner \
+        --volume /var/run/docker.sock:/var/run/docker.sock \
+        gitlab/gitlab-runner:latest &&
+    ssh gitlab-ec2 sudo network create main &&
+    ssh gitlab-ec2 sudo network connect --alias gitlab main gitlab &&
+    ssh gitlab-ec2 sudo network connect --alias docker main docker &&
+    ssh gitlab-ec2 sudo network connect main gitlab-runner &&
+    ssh gitlab-ec2 &&
+    bash
