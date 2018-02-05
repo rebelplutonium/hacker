@@ -8,8 +8,8 @@ xhost +local: &&
     cleanup(){
         ls -1 ${IDS}/containers | while read FILE
         do
-            sudo /usr/bin/docker container stop $(cat ${IDS}/containers/${FILE}) &&
-                sudo /usr/bin/docker container rm --volumes $(cat ${IDS}/containers/${FILE})
+            sudo /usr/bin/docker stop $(cat ${IDS}/containers/${FILE}) &&
+                sudo /usr/bin/docker rm --volumes $(cat ${IDS}/containers/${FILE})
         done &&
         ls -1 ${IDS}/networks | while read FILE
         do
@@ -53,7 +53,6 @@ xhost +local: &&
     sudo \
         --preserve-env \
         docker \
-        container \
         create \
         --interactive \
         --tty \
@@ -86,7 +85,6 @@ xhost +local: &&
     sudo \
         --preserve-env \
         docker \
-        container \
         create \
         --cidfile ${IDS}/containers/browser \
         --mount type=bind,source=/tmp/.X11-unix/X0,destination=/tmp/.X11-unix/X0,readonly=true \
@@ -98,5 +96,5 @@ xhost +local: &&
             http://my-hacker:10379 &&
     sudo /usr/bin/docker network connect $(cat ${IDS}/networks/main) $(cat ${IDS}/containers/browser) &&
     sudo /usr/bin/docker network connect --alias my-hacker $(cat ${IDS}/networks/main) $(cat ${IDS}/containers/hacker) &&
-    sudo /usr/bin/docker container start $(cat ${IDS}/containers/browser) &&
-    sudo /usr/bin/docker container start --interactive $(cat ${IDS}/containers/hacker)
+    sudo /usr/bin/docker start $(cat ${IDS}/containers/browser) &&
+    sudo /usr/bin/docker start --interactive $(cat ${IDS}/containers/hacker)
