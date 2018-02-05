@@ -26,6 +26,14 @@ xhost +local: &&
     while [ ${#} -gt 0 ]
     do
         case ${1} in
+            --dockerhub-userid)
+                export DOCKERHUB_USER_ID="${2}" &&
+                    shift 2
+            ;;
+            --dockerhub-password)
+                export DOCKERHUB_PASSWORD="${2}" &&
+                    shift 2
+            ;;
             --hacker-version)
                 HACKER_VERSION="${2}" &&
                     shift 2
@@ -42,6 +50,10 @@ xhost +local: &&
             ;;
         esac
     done &&
+    if [ ! -z "${DOCKERHUB_USER_ID}" ] && [ ! -z "${DOCKERHUB_PASSWORD}" ]
+    then
+        sudo /usr/bin/docker login --username ${DOCKERHUB_USER_ID} --password ${DOCKERHUB_PASSWORD}
+    fi &&
     sudo /usr/bin/docker volume create --label expiry=$(($(date +%s)+60*60*24*7)) > ${IDS}/volumes/storage &&
     sudo /usr/bin/docker volume create --label expiry=$(($(date +%s)+60*60*24*7)) > ${IDS}/volumes/docker &&
     sudo /usr/bin/docker network create --label expiry=$(($(date +%s)+60*60*24*7)) $(uuidgen) > ${IDS}/networks/main &&
