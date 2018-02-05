@@ -73,7 +73,7 @@ xhost +local: &&
         --env SECRETS_ORIGIN_REPOSITORY=secrets \
         --env EXTERNAL_DOCKER_VOLUME=$(cat ${IDS}/volumes/docker) \
         --privileged \
-        --mount type=bind,source=/tmp/.X11-unix/X0,destination=/tmp/.X11-unix/X0,readonly=true \
+        --volume /tmp/.X11-unix/X0:/tmp/.X11-unix/X0:ro \
         --volume /var/run/docker.sock:/var/run/docker.sock:ro\
         --volume /:/srv/host:ro \
         --volume /media:/srv/media:ro \
