@@ -90,8 +90,8 @@ xhost +local: &&
         --volume /:/srv/host:ro \
         --volume /media:/srv/media:ro \
         --volume /home:/srv/home:ro \
-        --volume $(cat ${IDS}/volumes/storage):/srv/storage:ro \
-        --volume $(cat ${IDS}/volumes/docker):/srv/docker:ro \
+        --volume $(cat ${IDS}/volumes/storage):/srv/storage \
+        --volume $(cat ${IDS}/volumes/docker):/srv/docker \
         --label expiry=$(($(date +%s)+60*60*24*7)) \
         rebelplutonium/hacker:${HACKER_VERSION} &&
     sudo \
@@ -100,7 +100,8 @@ xhost +local: &&
         create \
         --cidfile ${IDS}/containers/browser \
         --volume /tmp/.X11-unix/X0:/tmp/.X11-unix/X0:ro \
-        --volume $(cat ${IDS}/volumes/storage):/srv/storage:ro \
+        --volume $(cat ${IDS}/volumes/storage):/srv/storage \
+        --volume $(cat ${IDS}/volumes/docker):/srv/docker \
         --env DISPLAY=${DISPLAY} \
         --shm-size 256m \
         --label expiry=$(($(date +%s)+60*60*24*7)) \
