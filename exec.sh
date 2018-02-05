@@ -74,12 +74,12 @@ xhost +local: &&
         --env EXTERNAL_DOCKER_VOLUME=$(cat ${IDS}/volumes/docker) \
         --privileged \
         --mount type=bind,source=/tmp/.X11-unix/X0,destination=/tmp/.X11-unix/X0,readonly=true \
-        --mount type=bind,source=/var/run/docker.sock,destination=/var/run/docker.sock,readonly=true \
-        --mount type=bind,source=/,destination=/srv/host,readonly=true \
-        --mount type=bind,source=/media,destination=/srv/media,readonly=false \
-        --mount type=bind,source=/home,destination=/srv/home,readonly=false \
-        --mount type=volume,source=$(cat ${IDS}/volumes/storage),destination=/srv/storage,readonly=false \
-        --mount type=volume,source=$(cat ${IDS}/volumes/docker),destination=/srv/docker,readonly=false \
+        --volume /var/run/docker.sock:/var/run/docker.sock:ro\
+        --volume /:/srv/host:ro \
+        --volume /media:/srv/media:ro \
+        --volume /home:/srv/home:ro \
+        --volume $(cat ${IDS}/volumes/storage):/srv/storage:ro \
+        --volume $(cat ${IDS}/volumes/docker):/srv/docker:ro \
         --label expiry=$(($(date +%s)+60*60*24*7)) \
         rebelplutonium/hacker:${HACKER_VERSION} &&
     sudo \
@@ -87,8 +87,8 @@ xhost +local: &&
         docker \
         create \
         --cidfile ${IDS}/containers/browser \
-        --mount type=bind,source=/tmp/.X11-unix/X0,destination=/tmp/.X11-unix/X0,readonly=true \
-        --mount type=volume,source=$(cat ${IDS}/volumes/storage),destination=/srv/storage,readonly=false \
+        --volume /tmp/.X11-unix/X0:/tmp/.X11-unix/X0:ro \
+        --volume $(cat ${IDS}/volumes/storage):/srv/storage:ro \
         --env DISPLAY=${DISPLAY} \
         --shm-size 256m \
         --label expiry=$(($(date +%s)+60*60*24*7)) \
