@@ -14,10 +14,7 @@ TEMP=$(mktemp -d) &&
     pass git init &&
     pass git config user.name "${USER_NAME}" &&
     pass git config user.email "${USER_EMAIL}" &&
-    pass git remote add origin origin:${SECRETS_ORIGIN_ORGANIZATION}/${SECRETS_ORIGIN_REPOSITORY}.git &&
-    ssh-keyscan github.com >> ${HOME}/.ssh/known_hosts &&
-    echo "${ORIGIN_ID_RSA}" > /home/user/.ssh/origin.id_rsa &&
-    cat /opt/docker/extension/config >> /home/user/.ssh/config &&
+    pass git remote add origin https://github.com:${SECRETS_ORGANIZATION}/${SECRETS_REPOSITORY}.git &&
     ln -sf /usr/bin/post-commit ${HOME}/.password-store/.git/hooks/post-commit &&
     ln -sf /home/user/.ssh /opt/docker/workspace/dot_ssh &&
     ln -sf /home/user/bin /opt/docker/workspace &&
